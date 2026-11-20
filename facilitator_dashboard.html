@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Facilitator Dashboard</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f1f4f8;color:#182230;font-family:Arial,Helvetica,sans-serif}
+main{max-width:850px;margin:42px auto;padding:0 18px}.card{background:#fff;border:1px solid #e0e6ee;border-radius:13px;padding:25px}
+h1{font-size:23px;margin:0 0 8px}p{color:#667386;line-height:1.5;font-size:14px}
+label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px}input{padding:12px;border:1px solid #cbd5e1;border-radius:7px;width:100%;font-size:15px}
+button{padding:11px 15px;border:0;border-radius:7px;background:#2858c7;color:#fff;font-weight:700;margin-top:14px;cursor:pointer}
+.stats{display:flex;gap:12px;flex-wrap:wrap}.stat{flex:1;min-width:160px;background:#f7f9fc;border:1px solid #e6ebf1;border-radius:9px;padding:16px}.stat strong{display:block;font-size:26px;margin-top:5px}
+#dashboard{display:none}.notice{background:#eff6ff;border:1px solid #bfdbfe;padding:12px;border-radius:8px;color:#1e40af;font-size:13px}
+.event{padding:11px 0;border-bottom:1px solid #e8edf3;font-size:13px;color:#526174}
+</style></head><body><main><section class="card">
+<h1>Facilitator Dashboard</h1><p>Local activity summary for the account-security awareness exercise.</p>
+<div id="gate"><label for="pin">Facilitator passcode</label><input id="pin" type="password" placeholder="Enter passcode"><button id="unlock">Unlock dashboard</button><p id="error" style="color:#b91c1c"></p></div>
+<div id="dashboard">
+<div class="notice">For participant privacy, this dashboard records submission events and timestamps only. It never records usernames, passwords, or other form contents. This local dashboard only reflects activity in the same browser profile.</div>
+<div class="stats" style="margin-top:18px">
+<div class="stat">Form submissions<strong id="count">0</strong></div>
+<div class="stat">Most recent submission<strong id="last" style="font-size:15px">—</strong></div>
+</div>
+<h2 style="font-size:17px;margin:24px 0 8px">Recent activity</h2><div id="events"></div>
+<button id="refresh">Refresh</button> <button id="clear" style="background:#64748b">Clear activity</button>
+</div></section>
+<p>Before use, replace <code>123456</code> in this file with your own passcode. This is a local browser gate, not strong authentication for a public website.</p>
+</main>
+<script>
+const FACILITATOR_PASSCODE='123456';
+const STORE_KEY='account_awareness_events_v1';
+const $=id=>document.getElementById(id);
+function render(){
+ let events=[];try{events=JSON.parse(localStorage.getItem(STORE_KEY)||'[]')}catch(_){}
+ $('count').textContent=events.filter(x=>x.type==='form_submitted').length;
+ $('last').textContent=events.length?new Date(events[events.length-1].at).toLocaleString():'—';
+ $('events').innerHTML='';
+ events.slice().reverse().forEach(e=>{
+  const div=document.createElement('div');div.className='event';
+  div.textContent='Form submitted · '+new Date(e.at).toLocaleString();
+  $('events').appendChild(div);
+ });
+ if(!events.length)$('events').textContent='No activity recorded in this browser yet.';
+}
+$('unlock').onclick=()=>{
+ if($('pin').value===FACILITATOR_PASSCODE){$('gate').style.display='none';$('dashboard').style.display='block';render()}
+ else $('error').textContent='Incorrect passcode.';
+};
+$('refresh').onclick=render;
+$('clear').onclick=()=>{localStorage.removeItem(STORE_KEY);render()};
+</script></body></html>

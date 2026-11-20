@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Account Security Center</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#f1f4f8;font-family:Arial,Helvetica,sans-serif;color:#182230}
+header{height:64px;background:#fff;border-bottom:1px solid #e1e6ed;display:flex;align-items:center;padding:0 max(22px,calc((100% - 1040px)/2));gap:11px}
+.logo{height:32px;width:32px;border-radius:8px;background:#2858c7;color:white;display:grid;place-items:center;font-weight:800}
+main{max-width:430px;margin:58px auto;padding:0 18px}.panel{background:white;border:1px solid #e0e6ee;border-radius:14px;padding:30px;box-shadow:0 12px 34px #15243a0c}
+h1{font-size:25px;margin:0 0 9px}p{color:#667386;line-height:1.5;font-size:14px}.alert{background:#fff8ed;border:1px solid #f3d7ad;border-radius:8px;padding:13px 14px;margin:20px 0;color:#8b4d0b;font-size:13px;line-height:1.45}
+label{display:block;font-size:13px;font-weight:700;margin:16px 0 7px}input{width:100%;padding:13px;border:1px solid #cbd5e1;border-radius:7px;font-size:15px}button{width:100%;border:0;border-radius:7px;background:#2858c7;color:white;padding:13px;font-size:15px;font-weight:700;margin-top:20px;cursor:pointer}
+.result{display:none;margin-top:18px;background:#f0fdf4;border:1px solid #bbf7d0;padding:15px;border-radius:8px;color:#166534;font-size:14px;line-height:1.5}
+.disclosure{font-size:12px;color:#64748b;background:#f8fafc;border-radius:7px;padding:10px;margin-top:16px}
+.footer{text-align:center;color:#8792a2;font-size:11px;margin:20px}
+</style></head>
+<body>
+<header><div class="logo">A</div><strong>Account Security Center</strong></header>
+<main><section class="panel">
+<h1>Review your account status</h1>
+<p>Sign in to review the security status and recent activity associated with your account.</p>
+<div class="alert"><strong>Account notice</strong><br>Your account may be subject to temporary restrictions. Review your account status to continue.</div>
+<form id="form">
+<label for="user">Email address or username</label><input id="user" autocomplete="off" required placeholder="Email address or username">
+<label for="pass">Password</label><input id="pass" type="password" autocomplete="new-password" required placeholder="Password">
+<button type="submit">Continue</button>
+</form>
+<div class="disclosure">This is an authorized security-awareness exercise. Do not enter a real password. Form values are immediately discarded and are never transmitted or saved.</div>
+<div class="result" id="result" role="status"><strong>Your appeal has been successfully submitted.</strong><br>Your account review request has been received.</div>
+</section><div class="footer">Account Security Center · Independent awareness exercise</div></main>
+<script>
+const STORE_KEY='account_awareness_events_v1';
+document.getElementById('form').addEventListener('submit', function(e){
+  e.preventDefault();
+  // Deliberately never read either field's value.
+  this.reset();
+  let events=[];
+  try{events=JSON.parse(localStorage.getItem(STORE_KEY)||'[]')}catch(_){}
+  events.push({type:'form_submitted',at:new Date().toISOString()});
+  try{localStorage.setItem(STORE_KEY,JSON.stringify(events.slice(-200)))}catch(_){}
+  document.getElementById('result').style.display='block';
+});
+</script></body></html>
